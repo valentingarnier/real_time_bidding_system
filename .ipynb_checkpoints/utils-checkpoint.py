@@ -123,4 +123,15 @@ def SelectBest(X, y, alpha=0.01, K='all'):
     featureScores = featureScores.loc[featureScores['p_value < alpha'] == True]
     return featureScores, new_X
 
-def compute_mutual_information(X, y, thre
+def compute_mutual_information(X, y, threshold, seed=49):
+    col_names = pd.DataFrame(X.columns)
+    # MI computing
+    mi = pd.DataFrame(mutual_info_regression(X,y,random_state=seed))
+    # dataframe creation
+    mutualInfo = pd.concat([col_names,mi],axis=1)
+    # setting cols names
+    mutualInfo.columns = ["Feature",'Importance']
+    # ordering results
+    mutualInfo.sort_values('Importance', inplace=True, ascending=False)
+    mutualInfo = mutualInfo.loc[mutualInfo['Importance'] >= threshold]
+    return mutualInfo
